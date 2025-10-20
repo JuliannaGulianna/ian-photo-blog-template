@@ -1,0 +1,6 @@
+title: "Ian's Photography Blog Template"
+description: "Editable GitHub Pages blog with placeholders for posts, galleries, and info."
+theme: minima
+author: "Ian"
+plugins:
+  - jekyll-feed
