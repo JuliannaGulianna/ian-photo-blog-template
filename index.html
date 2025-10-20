@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ian's Photography</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        /* Header - Minimal Top Bar */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.98);
+            border-bottom: 1px solid #e0e0e0;
+            z-index: 1000;
+            padding: 1.5rem 3rem;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .site-title {
+            font-size: 1.6rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: #000000;
+            text-transform: uppercase;
+        }
+
+        .site-title sup {
+            font-size: 0.6rem;
+            margin-left: 2px;
+        }
+
+        nav {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #000000;
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+            font-weight: 300;
+        }
+
+        nav a:hover {
+            color: #666;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1.2rem;
+            margin-left: 2rem;
+        }
+
+        .social-icons a {
+            color: #000000;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .social-icons a:hover {
+            color: #666;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            margin-top: 70px;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 300;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 sup {
+            font-size: 1.5rem;
+            margin-left: 4px;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 300;
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Photo Gallery - Uniform Grid */
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .photo-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 3/2;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+        }
+
+        .photo-placeholder-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #b8985f;
+            transition: all 0.4s ease;
+        }
+
+        .photo-item:hover .photo-placeholder-inner {
+            background-color: rgba(184, 152, 95, 0.1);
+            border-color: #9a7c4f;
+        }
+
+        .photo-placeholder-inner i {
+            font-size: 2.5rem;
+            color: #b8985f;
+            margin-bottom: 0.8rem;
+        }
+
+        .photo-placeholder-inner span {
+            color: #666;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        /* Modal for Expanded Photo */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: #ffffff;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #b8985f;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* About Modal */
+        .about-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            overflow-y: auto;
+        }
+
+        .about-modal.active {
+            display: block;
+        }
+
+        .about-content-modal {
+            max-width: 900px;
+            margin: 5rem auto;
+            padding: 4rem;
+            background-color: #ffffff;
+            position: relative;
+        }
+
+        .about-content-modal h2 {
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #b8985f;
+            padding-bottom: 1rem;
+        }
+
+        .about-content-modal p {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        /* Contact/Email Subscription Section */
+        .email-subscription {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .subscription-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .subscription-content h2 {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .subscription-content p {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            color: #cccccc;
+        }
+
+        .email-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .email-form input {
+            padding: 1rem 1.5rem;
+            border: none;
+            background-color: #f5f5f5;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .email-form button {
+            padding: 1rem 2rem;
+            background-color: #b8985f;
+            color: #ffffff;
+            border: none;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 300;
+        }
+
+        .email-form button:hover {
+            background-color: #9a7c4f;
+        }
+
+        .subscriber-count {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 3rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-info {
+            flex: 1;
+        }
+
+        .footer-info h3 {
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+        }
+
+        .footer-info h3 sup {
+            font-size: 0.5rem;
+        }
+
+        .footer-info p {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-social a {
+            color: #ffffff;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .footer-social a:hover {
+            color: #b8985f;
+        }
+
+        .copyright {
+            width: 100%;
+            border-top: 1px solid #333;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #999;
+            line-height: 1.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem 1.5rem;
+            }
+
+            .site-title {
+                font-size: 1.2rem;
+                letter-spacing: 2px;
+            }
+
+            nav {
+                gap: 1.5rem;
+            }
+
+            .social-icons {
+                margin-left: 1rem;
+                gap: 0.8rem;
+            }
+
+            .hero {
+                height: 50vh;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+                letter-spacing: 6px;
+            }
+
+            .hero p {
+                font-size: 0.85rem;
+                letter-spacing: 1px;
+            }
+
+            .photo-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1rem;
+            }
+
+            .about-content-modal {
+                padding: 2rem;
+                margin: 2rem 1rem;
+            }
+
+            .about-content-modal h2 {
+                font-size: 2rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header>
+        <div class="header-content">
+            <div class="site-title">Ian's Photography<sup>®</sup></div>
+            <nav>
+                <a href="#" id="aboutLink">About</a>
+                <a href="#contact">Contact</a>
+                <div class="social-icons">
+                    <a href="#" title="Instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="Facebook" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" title="Twitter" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Ian's Photography<sup>®</sup></h1>
+            <p>Mission Statement Placeholder</p>
+        </div>
+    </div>
+
+    <!-- Photo Gallery -->
+    <div class="gallery-container">
+        <div class="photo-grid">
+            <div class="photo-item" onclick="openModal('photo1')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 1</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo2')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 2</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo3')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 3</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo4')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 4</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo5')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 5</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo6')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 6</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo7')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 7</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo8')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 8</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo9')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 9</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo10')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 10</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo11')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 11</span>
+                </div>
+            </div>
+            <div class="photo-item" onclick="openModal('photo12')">
+                <div class="photo-placeholder-inner">
+                    <i class="fas fa-camera"></i>
+                    <span>PHOTO 12</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Subscription Section -->
+    <div class="email-subscription" id="contact">
+        <div class="subscription-content">
+            <h2>Subscribe To Blog</h2>
+            <p>Enter your email address to subscribe to this blog and receive notifications of new posts by email.</p>
+            <form class="email-form" onsubmit="return false;">
+                <input type="email" placeholder="Email Address" required>
+                <button type="submit">Subscribe</button>
+            </form>
+            <p class="subscriber-count">Join other subscribers</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>Ian's Photography<sup>®</sup></h3>
+                <p>Tagline Placeholder</p>
+            </div>
+            <div class="footer-social">
+                <a href="#" title="Instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" title="Facebook" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" title="Twitter" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2025 Ian's Photography. All Rights Reserved.</p>
+            <p>All images and content on this website are the intellectual property of Ian and may not be used without explicit written permission. Unauthorized use, reproduction, or distribution is strictly prohibited.</p>
+        </div>
+    </footer>
+
+    <!-- Photo Modal -->
+    <div class="modal" id="photoModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div style="background: #f0f0f0; padding: 4rem; text-align: center; border: 2px dashed #b8985f;">
+                <i class="fas fa-image" style="font-size: 5rem; color: #b8985f; margin-bottom: 1rem;"></i>
+                <p style="color: #666; font-size: 1.2rem;">Full Size Photo Placeholder</p>
+                <p style="color: #999; font-size: 0.9rem; margin-top: 0.5rem;">Click outside to close</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="about-modal" id="aboutModal">
+        <div class="about-content-modal">
+            <span class="modal-close" onclick="closeAboutModal()" style="color: #000;">&times;</span>
+            <h2>About</h2>
+            <p><strong>About Me Placeholder</strong></p>
+            <p>This is a placeholder for biography. Share your story, journey into photography, what inspires you, and what you hope to capture through your lens. Let your personality shine through and connect with your audience.</p>
+            
+            <p><strong>Photography Approach Placeholder</strong></p>
+            <p>Describe your photography style, what makes your work unique, and your creative process. Share what drives your passion for photography and how you approach each project.</p>
+            
+            <p><strong>Camera Gear & Equipment Placeholder</strong></p>
+            <p>List your camera equipment, favorite lenses, and any special gear you use. This helps other photographers understand your technical approach and can be interesting for visitors curious about your process.</p>
+            
+            <p><strong>Experience Placeholder</strong></p>
+            <p>Share your professional background, notable projects, publications, or any achievements in photography. This builds credibility and helps potential clients understand your expertise.</p>
+        </div>
+    </div>
+
+    <script>
+        // Photo Modal Functions
+        function openModal(photoId) {
+            document.getElementById('photoModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('photoModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('photoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // About Modal Functions
+        document.getElementById('aboutLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('aboutModal').classList.add('active');
+        });
+
+        function closeAboutModal() {
+            document.getElementById('aboutModal').classList.remove('active');
+        }
+
+        // Close about modal when clicking outside
+        document.getElementById('aboutModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAboutModal();
+            }
+        });
+
+        // Smooth scroll to contact section
+        document.querySelector('a[href="#contact"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
